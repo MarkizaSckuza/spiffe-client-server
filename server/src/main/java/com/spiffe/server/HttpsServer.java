@@ -6,9 +6,9 @@ import io.spiffe.provider.SpiffeKeyManager;
 import io.spiffe.provider.SpiffeSslContextFactory;
 import io.spiffe.provider.SpiffeSslContextFactory.SslContextOptions;
 import io.spiffe.provider.SpiffeTrustManager;
-import io.spiffe.provider.X509SourceManager;
 import io.spiffe.provider.exception.SpiffeProviderException;
 import io.spiffe.spiffeid.SpiffeId;
+import io.spiffe.workloadapi.DefaultX509Source;
 import io.spiffe.workloadapi.X509Source;
 import lombok.val;
 
@@ -40,8 +40,14 @@ public class HttpsServer {
     int port;
     String acceptedSpiffeID;
 
+
+    String spiffeSocket;
+
     public static void main(String[] args) {
-        HttpsServer httpsServer = new HttpsServer(4000, args[0]);
+//        HttpsServer httpsServer = new HttpsServer(4000, args[0]);
+
+        String spiffeSocket = "unix:/run/spire/sockets/agent.sock";
+        HttpsServer httpsServer = new HttpsServer(4000, args[0], spiffeSocket);
         try {
             httpsServer.run();
         } catch (IOException | KeyManagementException | NoSuchAlgorithmException e) {
@@ -49,15 +55,35 @@ public class HttpsServer {
         }
     }
 
-    HttpsServer(int port, String acceptedSpiffeID) {
+//    HttpsServer(int port, String acceptedSpiffeID) {
+//        this.port = port;
+//        this.acceptedSpiffeID = acceptedSpiffeID;
+//    }
+
+    HttpsServer(int port, String acceptedSpiffeID, String spiffeSocket) {
         this.port = port;
         this.acceptedSpiffeID = acceptedSpiffeID;
+        this.spiffeSocket = spiffeSocket;
     }
 
+
+
     void run() throws IOException, KeyManagementException, NoSuchAlgorithmException {
+//        X509Source x509Source;
+//        try {
+//            x509Source = X509SourceManager.getX509Source();
+//        } catch (SocketEndpointAddressException | X509SourceException e) {
+//            throw new SpiffeProviderException("Error at getting the X509Source instance", e);
+//        }
+
+
+        val sourceOptions = DefaultX509Source.X509SourceOptions
+                .builder()
+                .spiffeSocketPath(spiffeSocket)
+                .build();
         X509Source x509Source;
         try {
-            x509Source = X509SourceManager.getX509Source();
+            x509Source = DefaultX509Source.newSource(sourceOptions);
         } catch (SocketEndpointAddressException | X509SourceException e) {
             throw new SpiffeProviderException("Error at getting the X509Source instance", e);
         }

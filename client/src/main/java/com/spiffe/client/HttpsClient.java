@@ -7,7 +7,6 @@ import io.spiffe.provider.SpiffeSslContextFactory;
 import io.spiffe.provider.SpiffeSslContextFactory.SslContextOptions;
 import io.spiffe.provider.SpiffeTrustManager;
 import io.spiffe.spiffeid.SpiffeId;
-import io.spiffe.spiffeid.SpiffeIdUtils;
 import io.spiffe.workloadapi.DefaultX509Source;
 import lombok.val;
 
@@ -38,7 +37,7 @@ public class HttpsClient {
     int serverPort;
 
     public static void main(String[] args) {
-        String spiffeSocket = "unix:/tmp/spire-agent/public/api.sock";
+        String spiffeSocket = "unix:/run/spire/sockets/agent.sock";
         HttpsClient httpsClient = new HttpsClient(4000, args[0], spiffeSocket, () -> Collections.singleton(SpiffeId.parse(args[1])));
         try {
             httpsClient.run();
