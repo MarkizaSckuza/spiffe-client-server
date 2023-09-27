@@ -62,6 +62,7 @@ class WorkloadThread extends Thread {
             sslSocket.close();
         } catch (Exception e) {
             log.log(Level.SEVERE, e.getMessage());
+            e.printStackTrace();
         }
     }
 }
