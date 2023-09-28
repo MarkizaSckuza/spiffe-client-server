@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spiffe-client
+  labels:
+    app: spiffe-client
+spec:
+  selector:
+    matchLabels:
+      app: spiffe-client
+  template:
+    metadata:
+      labels:
+        app: spiffe-client
+    spec:
+      hostPID: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      serviceAccountName: client
+      containers:
+        - name: spiffe-client
+          image: markizasckuza/spiffe-client:latest
+          args: ["IP", "spiffe://example.org/ns/default/sa/server"]
+          volumeMounts:
+            - name: spire-agent-socket
+              mountPath: /run/spire/sockets
+              readOnly: true
+      volumes:
+        - name: spire-agent-socket
+          hostPath:
+            path: /run/spire/sockets
+            type: Directory
